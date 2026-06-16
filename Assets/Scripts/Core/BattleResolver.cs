@@ -44,7 +44,6 @@ public class BattleResolver
 
         if (deadCards.Count == 0) return;
 
-        // 판정 순서: 도발 해제 → 기절 해제(생략, 죽으면 무의미) → 필드 제거
         foreach (var (card, team) in deadCards)
         {
             card.ClearProvoke();
@@ -52,8 +51,8 @@ public class BattleResolver
             OnCardRemoved?.Invoke(card, team);
         }
 
-        // 양측 동시 리필
         board.TryRefill(Team.Player);
         board.TryRefill(Team.Enemy);
     }
+
 }

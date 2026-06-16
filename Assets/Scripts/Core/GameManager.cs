@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
     {
         BattleResolver.ResolveAction(actor, actionType, target);
 
-        yield return null; // 연출 대기 슬롯 (추후 DOTween 코루틴으로 교체)
+        yield return null;
 
         if (!CheckGameOver())
             TurnManager.EndTurn();

@@ -12,6 +12,8 @@ public class BoardManager
 
     public CardInstance ActiveProvoker { get; private set; }
 
+    public int GetReserveCount(Team team) => GetReserve(team).Count;
+
     public event Action<CardInstance, Team, int> OnCardRefilled; // card, team, slotIndex
 
     public CardInstance[] GetField(Team team) =>

@@ -17,4 +17,4 @@ MonoBehaviour:
   maxHp: 12
   atk: 3
   skillCooldown: 2
-  illustration: {fileID: 21300000, guid: 4c72ae969f1e5cd469823efeafaa1880, type: 3}
+  illustration: {fileID: 21300000, guid: f4cda12acee3a284f862b79a92f6a0c7, type: 3}
