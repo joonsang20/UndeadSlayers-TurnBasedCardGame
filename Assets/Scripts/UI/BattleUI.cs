@@ -1,5 +1,5 @@
+using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +18,8 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private GameObject[] enemyReserveCards  = new GameObject[3];
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI turnIndicatorText;
+    [SerializeField] private GameObject playerTurnImage;
+    [SerializeField] private GameObject enemyTurnImage;
     [SerializeField] private GameObject actionPanel;
     [SerializeField] private Button btnAttack;
     [SerializeField] private Button btnSkill;
@@ -29,9 +30,12 @@ public class BattleUI : MonoBehaviour
 
     private enum InputState { Idle, SelectingTarget }
     private InputState inputState = InputState.Idle;
+    private bool isActionPhaseActive = false;
 
     private CardView selectedActor;
     private ActionType pendingActionType;
+
+    private const float TurnIndicatorDuration = 1.2f;
 
     private void Start()
     {
@@ -46,6 +50,8 @@ public class BattleUI : MonoBehaviour
         gameManager.BattleResolver.OnCardRemoved += HandleCardRemoved;
 
         actionPanel.SetActive(false);
+        playerTurnImage.SetActive(false);
+        enemyTurnImage.SetActive(false);
 
         gameManager.StartGame();
         SpawnAllCards();
@@ -82,15 +88,29 @@ public class BattleUI : MonoBehaviour
 
     private void HandleTurnStarted(Team team)
     {
-        turnIndicatorText.text = team == Team.Player ? "Player Turn" : "Enemy Turn";
+        playerTurnImage.SetActive(team == Team.Player);
+        enemyTurnImage.SetActive(team == Team.Enemy);
     }
 
     private void HandleActionPhaseBegin(Team team)
     {
+        StartCoroutine(ActionPhaseRoutine(team));
+    }
+
+    private IEnumerator ActionPhaseRoutine(Team team)
+    {
+        yield return new WaitForSeconds(TurnIndicatorDuration);
+
         if (team == Team.Player)
+        {
+            isActionPhaseActive = true;
             ShowSelectableCards();
+        }
         else
+        {
+            isActionPhaseActive = false;
             ClearAllHighlights();
+        }
     }
 
     private void ShowSelectableCards()
@@ -112,6 +132,7 @@ public class BattleUI : MonoBehaviour
     {
         if (gameManager.IsGameOver) return;
         if (gameManager.TurnManager.CurrentTurn != Team.Player) return;
+        if (!isActionPhaseActive) return;
 
         if (inputState == InputState.Idle)
         {
@@ -144,7 +165,6 @@ public class BattleUI : MonoBehaviour
         if (selectedActor == null) return;
         pendingActionType = actionType;
 
-        // 타겟 불필요 스킬 (도발) 즉시 실행
         if (actionType == ActionType.Skill && !selectedActor.Card.SkillStrategy.RequiresTarget)
         {
             FinishAction(null);
@@ -198,6 +218,7 @@ public class BattleUI : MonoBehaviour
         ClearAllHighlights();
         actionPanel.SetActive(false);
         inputState = InputState.Idle;
+        isActionPhaseActive = false;
 
         gameManager.OnPlayerAction(selectedActor.Card, pendingActionType, targetView?.Card);
         selectedActor = null;
@@ -245,6 +266,9 @@ public class BattleUI : MonoBehaviour
     {
         ClearAllHighlights();
         actionPanel.SetActive(false);
+        isActionPhaseActive = false;
+        playerTurnImage.SetActive(false);
+        enemyTurnImage.SetActive(false);
     }
 
     // ───────────── 유틸 ─────────────

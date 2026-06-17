@@ -105,7 +105,7 @@ public class CardInstance
     public void ActivateProvoke()
     {
         IsProvoking = true;
-        ProvokeRemainingTurns = 1;
+        ProvokeRemainingTurns = 2;
         OnProvokeChanged?.Invoke(true);
     }
 

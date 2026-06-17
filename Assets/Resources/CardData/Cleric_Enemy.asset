@@ -16,5 +16,5 @@ MonoBehaviour:
   cardType: 3
   maxHp: 8
   atk: 2
-  skillCooldown: 2
+  skillCooldown: 3
   illustration: {fileID: 21300000, guid: 61111ed0d0b5be64fbed7f69d6b098ac, type: 3}

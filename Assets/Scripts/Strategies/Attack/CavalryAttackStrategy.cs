@@ -16,8 +16,8 @@ public class CavalryAttackStrategy : IAttackStrategy
 
         if (adjacents.Count == 0) return;
 
-        var splashTarget = adjacents[Random.Range(0, adjacents.Count)];
         int splashDamage = Mathf.CeilToInt(attacker.Atk * 0.5f);
-        splashTarget.TakeDamage(splashDamage);
+        foreach (var adj in adjacents)
+            adj.TakeDamage(splashDamage);
     }
 }
