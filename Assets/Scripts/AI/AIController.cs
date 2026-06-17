@@ -15,16 +15,23 @@ public class AIController
 
     public void ExecuteTurn()
     {
+        var (actor, actionType, target) = DecideTurn();
+        if (actor != null)
+            resolver.ResolveAction(actor, actionType, target);
+    }
+
+    public (CardInstance actor, ActionType actionType, CardInstance target) DecideTurn()
+    {
         var actable = board.GetActableCards(Team.Enemy);
-        if (actable.Count == 0) return;
+        if (actable.Count == 0) return (null, ActionType.BasicAttack, null);
 
         var actor = actable[Random.Range(0, actable.Count)];
         var actionType = DetermineAction(actor);
         var target = SelectTarget(actor, actionType);
 
-        if (target == null) return;
+        if (target == null) return (null, ActionType.BasicAttack, null);
 
-        resolver.ResolveAction(actor, actionType, target);
+        return (actor, actionType, target);
     }
 
     private ActionType DetermineAction(CardInstance actor)

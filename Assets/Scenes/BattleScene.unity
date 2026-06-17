@@ -234,6 +234,7 @@ MonoBehaviour:
   archerEnemyData: {fileID: 11400000, guid: 7f61b8e955fb3744d92c77b5ac0f836c, type: 2}
   cavalryEnemyData: {fileID: 11400000, guid: b66b1ec4d316e4a4dabb51e2f2e54800, type: 2}
   clericEnemyData: {fileID: 11400000, guid: 2fecd6bb0c405cf41ab3645c0ed5f14c, type: 2}
+  battleAnimator: {fileID: 1909269580}
 --- !u!4 &224014530
 Transform:
   m_ObjectHideFlags: 0
@@ -2043,6 +2044,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1909269578}
   - component: {fileID: 1909269579}
+  - component: {fileID: 1909269580}
   m_Layer: 0
   m_Name: BattleUI
   m_TagString: Untagged
@@ -2078,6 +2080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 224014529}
+  battleAnimator: {fileID: 1909269580}
   cardViewPrefab: {fileID: -7485112036371758453, guid: aaca7c19a7be4934ea1192c1d3cbb7bd, type: 3}
   playerSlots:
   - {fileID: 1014290218}
@@ -2095,12 +2098,26 @@ MonoBehaviour:
   - {fileID: 85998697}
   - {fileID: 873433211}
   - {fileID: 625151430}
-  playerTurnImage: {fileID: 2073193639}
-  enemyTurnImage: {fileID: 1876021214}
+  playerTurnImage: {fileID: 2073193641}
+  enemyTurnImage: {fileID: 1876021216}
   actionPanel: {fileID: 1500470734}
   btnAttack: {fileID: 319920295}
   btnSkill: {fileID: 1252419529}
   btnCancel: {fileID: 1023253818}
+--- !u!114 &1909269580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909269577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc794be17508f2f4fb5b8639d5eb986c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arrowSprite: {fileID: 21300000, guid: a004aef29e3296647a5da7280f350ea1, type: 3}
+  arrowContainer: {fileID: 1793112263}
 --- !u!1 &1930804415
 GameObject:
   m_ObjectHideFlags: 0

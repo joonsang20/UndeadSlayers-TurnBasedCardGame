@@ -9,6 +9,7 @@ public class TurnManager
     public event Action<Team> OnTurnStarted;
     public event Action<Team> OnActionPhaseBegin;
     public event Action<Team> OnTurnEnded;
+    public event Action<CardInstance> OnPassiveReady;
 
     public TurnManager(BoardManager board)
     {
@@ -39,11 +40,11 @@ public class TurnManager
                 card.TryReleaseStun();
         }
 
-        // 3. 패시브 발동 (기절 중인 힐러도 패시브 작동)
+        // 3. 패시브 예약 (실제 실행은 연출 이후 GameManager에서)
         foreach (var card in field)
         {
-            if (card != null && card.IsAlive)
-                card.PassiveStrategy?.OnTurnStart(card, board);
+            if (card != null && card.IsAlive && card.PassiveStrategy != null)
+                OnPassiveReady?.Invoke(card);
         }
 
         OnTurnStarted?.Invoke(CurrentTurn);

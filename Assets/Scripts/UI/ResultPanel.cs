@@ -40,6 +40,6 @@ public class ResultPanel : MonoBehaviour
 
     private void OnRestartClicked()
     {
-        SceneManager.LoadScene("TitleScene");
+        ScreenFader.Load("TitleScene");
     }
 }

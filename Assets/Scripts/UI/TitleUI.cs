@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class TitleUI : MonoBehaviour
@@ -15,7 +14,7 @@ public class TitleUI : MonoBehaviour
 
     private void OnStartClicked()
     {
-        SceneManager.LoadScene("BattleScene");
+        ScreenFader.Load("BattleScene");
     }
 
     private void OnQuitClicked()

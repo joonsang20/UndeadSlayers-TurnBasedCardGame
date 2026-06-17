@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ public class BattleUI : MonoBehaviour
 {
     [Header("Core")]
     [SerializeField] private GameManager gameManager;
+    [SerializeField] private BattleAnimator battleAnimator;
     [SerializeField] private CardView cardViewPrefab;
 
     [Header("Field Slots")]
@@ -18,8 +20,8 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private GameObject[] enemyReserveCards  = new GameObject[3];
 
     [Header("UI")]
-    [SerializeField] private GameObject playerTurnImage;
-    [SerializeField] private GameObject enemyTurnImage;
+    [SerializeField] private Image playerTurnImage;
+    [SerializeField] private Image enemyTurnImage;
     [SerializeField] private GameObject actionPanel;
     [SerializeField] private Button btnAttack;
     [SerializeField] private Button btnSkill;
@@ -50,8 +52,8 @@ public class BattleUI : MonoBehaviour
         gameManager.BattleResolver.OnCardRemoved += HandleCardRemoved;
 
         actionPanel.SetActive(false);
-        playerTurnImage.SetActive(false);
-        enemyTurnImage.SetActive(false);
+        playerTurnImage.gameObject.SetActive(false);
+        enemyTurnImage.gameObject.SetActive(false);
 
         gameManager.StartGame();
         SpawnAllCards();
@@ -81,6 +83,7 @@ public class BattleUI : MonoBehaviour
         var view = Instantiate(cardViewPrefab, slot);
         view.Setup(card, index);
         view.OnClicked += OnCardViewClicked;
+        battleAnimator.Register(card, view);
         return view;
     }
 
@@ -88,8 +91,17 @@ public class BattleUI : MonoBehaviour
 
     private void HandleTurnStarted(Team team)
     {
-        playerTurnImage.SetActive(team == Team.Player);
-        enemyTurnImage.SetActive(team == Team.Enemy);
+        ShowTurnIndicator(team == Team.Player ? playerTurnImage : enemyTurnImage,
+                          team == Team.Player ? enemyTurnImage   : playerTurnImage);
+    }
+
+    private void ShowTurnIndicator(Image show, Image hide)
+    {
+        hide.gameObject.SetActive(false);
+
+        show.color = new Color(1f, 1f, 1f, 0f);
+        show.gameObject.SetActive(true);
+        show.DOFade(1f, 0.4f);
     }
 
     private void HandleActionPhaseBegin(Team team)
@@ -99,7 +111,26 @@ public class BattleUI : MonoBehaviour
 
     private IEnumerator ActionPhaseRoutine(Team team)
     {
-        yield return new WaitForSeconds(TurnIndicatorDuration);
+        yield return new WaitForSeconds(0.5f);
+
+        // 패시브 보유 카드가 있으면 연출 재생 후 실제 패시브 실행
+        foreach (var card in gameManager.Board.GetField(team))
+        {
+            if (card == null || !card.IsAlive || card.PassiveStrategy == null) continue;
+
+            var targets = new List<CardInstance>();
+            foreach (var ally in gameManager.Board.GetField(team))
+                if (ally != null && ally.IsAlive && ally != card)
+                    targets.Add(ally);
+
+            if (targets.Count > 0)
+                yield return StartCoroutine(battleAnimator.PlayPassiveEffect(card, targets));
+        }
+
+        // 애니메이션 완료 후 HP 실제 반영
+        gameManager.ExecutePendingPassives();
+
+        yield return new WaitForSeconds(0.7f);
 
         if (team == Team.Player)
         {
@@ -245,6 +276,7 @@ public class BattleUI : MonoBehaviour
         var slots = GetSlots(team);
 
         views[slotIndex] = CreateCardView(card, slots[slotIndex], slotIndex);
+        StartCoroutine(battleAnimator.PlayRefill(views[slotIndex]));
         UpdateReserveDisplay();
     }
 
@@ -267,8 +299,8 @@ public class BattleUI : MonoBehaviour
         ClearAllHighlights();
         actionPanel.SetActive(false);
         isActionPhaseActive = false;
-        playerTurnImage.SetActive(false);
-        enemyTurnImage.SetActive(false);
+        playerTurnImage.gameObject.SetActive(false);
+        enemyTurnImage.gameObject.SetActive(false);
     }
 
     // ───────────── 유틸 ─────────────

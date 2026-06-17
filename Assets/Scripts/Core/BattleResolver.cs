@@ -50,9 +50,6 @@ public class BattleResolver
             board.RemoveCard(card, team);
             OnCardRemoved?.Invoke(card, team);
         }
-
-        board.TryRefill(Team.Player);
-        board.TryRefill(Team.Enemy);
     }
 
 }

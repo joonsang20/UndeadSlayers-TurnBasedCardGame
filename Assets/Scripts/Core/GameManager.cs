@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CardData cavalryEnemyData;
     [SerializeField] private CardData clericEnemyData;
 
+    [SerializeField] private BattleAnimator battleAnimator;
+
     public BoardManager Board { get; private set; }
     public TurnManager TurnManager { get; private set; }
     public BattleResolver BattleResolver { get; private set; }
@@ -30,6 +32,8 @@ public class GameManager : MonoBehaviour
     public event Action<Team> OnTurnStarted;
     public event Action<Team> OnActionPhaseBegin;
 
+    private readonly List<CardInstance> pendingPassives = new List<CardInstance>();
+
     private void Awake()
     {
         Board = new BoardManager();
@@ -39,6 +43,7 @@ public class GameManager : MonoBehaviour
 
         TurnManager.OnTurnStarted += t => OnTurnStarted?.Invoke(t);
         TurnManager.OnActionPhaseBegin += HandleActionPhaseBegin;
+        TurnManager.OnPassiveReady += card => pendingPassives.Add(card);
     }
 
     public void StartGame()
@@ -57,6 +62,13 @@ public class GameManager : MonoBehaviour
         TurnManager.StartFirstTurn();
     }
 
+    public void ExecutePendingPassives()
+    {
+        foreach (var card in pendingPassives)
+            card.PassiveStrategy?.OnTurnStart(card, Board);
+        pendingPassives.Clear();
+    }
+
     // UI에서 플레이어 행동 입력 시 호출
     public void OnPlayerAction(CardInstance actor, ActionType actionType, CardInstance target)
     {
@@ -66,9 +78,11 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ExecutePlayerAction(CardInstance actor, ActionType actionType, CardInstance target)
     {
-        BattleResolver.ResolveAction(actor, actionType, target);
+        yield return StartCoroutine(battleAnimator.PlayActionAnimation(actor, actionType, target));
 
-        yield return null;
+        var snapshot = TakeHpSnapshot();
+        BattleResolver.ResolveAction(actor, actionType, target);
+        yield return StartCoroutine(PostActionSequence(snapshot));
 
         if (!CheckGameOver())
             TurnManager.EndTurn();
@@ -86,7 +100,15 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.8f);
 
-        AIController.ExecuteTurn();
+        var (actor, actionType, target) = AIController.DecideTurn();
+        if (actor != null)
+        {
+            yield return StartCoroutine(battleAnimator.PlayActionAnimation(actor, actionType, target));
+
+            var snapshot = TakeHpSnapshot();
+            BattleResolver.ResolveAction(actor, actionType, target);
+            yield return StartCoroutine(PostActionSequence(snapshot));
+        }
 
         yield return null;
 
@@ -110,6 +132,25 @@ public class GameManager : MonoBehaviour
 
         OnGameOver?.Invoke(CurrentResult);
         return true;
+    }
+
+    private IEnumerator PostActionSequence(Dictionary<CardInstance, int> snapshot)
+    {
+        yield return StartCoroutine(battleAnimator.PlayHitsFromDamage(snapshot));
+        yield return StartCoroutine(battleAnimator.PlayDeathAnimations(snapshot));
+        Board.TryRefill(Team.Player);
+        Board.TryRefill(Team.Enemy);
+        yield return new WaitForSeconds(0.8f);
+    }
+
+    private Dictionary<CardInstance, int> TakeHpSnapshot()
+    {
+        var snapshot = new Dictionary<CardInstance, int>();
+        foreach (var team in new[] { Team.Player, Team.Enemy })
+            foreach (var card in Board.GetField(team))
+                if (card != null && card.IsAlive)
+                    snapshot[card] = card.CurrentHp;
+        return snapshot;
     }
 
     private void Shuffle<T>(List<T> list)
