@@ -28,16 +28,16 @@ public class TooltipUI : MonoBehaviour
 
         if (pos.x + tooltipWidth + 15f > Screen.width)
         {
-            rect.pivot = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(1f, 0f);
             pos.x -= 15f;
         }
         else
         {
-            rect.pivot = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0f, 0f);
             pos.x += 15f;
         }
 
-        pos.y -= 15f;
+        pos.y += 15f;
         rect.position = pos;
     }
 
