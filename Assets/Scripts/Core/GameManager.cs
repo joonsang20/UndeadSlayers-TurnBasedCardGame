@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     public event Action<GameResult> OnGameOver;
     public event Action<Team> OnTurnStarted;
     public event Action<Team> OnActionPhaseBegin;
+    public event Action<CardInstance, ActionType, CardInstance> OnActionPerformed;
 
     private readonly List<CardInstance> pendingPassives = new List<CardInstance>();
 
@@ -82,7 +83,9 @@ public class GameManager : MonoBehaviour
 
         var snapshot = TakeHpSnapshot();
         BattleResolver.ResolveAction(actor, actionType, target);
+        OnActionPerformed?.Invoke(actor, actionType, target);
         yield return StartCoroutine(PostActionSequence(snapshot));
+        yield return new WaitForSeconds(1f);
 
         if (!CheckGameOver())
             TurnManager.EndTurn();
@@ -107,10 +110,11 @@ public class GameManager : MonoBehaviour
 
             var snapshot = TakeHpSnapshot();
             BattleResolver.ResolveAction(actor, actionType, target);
+            OnActionPerformed?.Invoke(actor, actionType, target);
             yield return StartCoroutine(PostActionSequence(snapshot));
         }
 
-        yield return null;
+        yield return new WaitForSeconds(1f);
 
         if (!CheckGameOver())
             TurnManager.EndTurn();

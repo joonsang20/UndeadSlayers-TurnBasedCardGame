@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0f09ad5d23c0142b17a9636809e729, type: 3}
   m_Name: Archer_Enemy
   m_EditorClassIdentifier: 
-  cardName: "\uC2A4\uCF08\uB808\uD1A4 \uAD81\uC218"
+  cardName: Skeleton Archer
   cardType: 1
   maxHp: 7
   atk: 4
   skillCooldown: 3
   illustration: {fileID: 21300000, guid: 5f4d5527ffe3fc245a92577192e89e1c, type: 3}
+  skillDescription: Deals 1.5x damage to a single target

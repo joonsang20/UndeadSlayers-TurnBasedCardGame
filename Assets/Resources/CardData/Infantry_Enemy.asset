@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0f09ad5d23c0142b17a9636809e729, type: 3}
   m_Name: Infantry_Enemy
   m_EditorClassIdentifier: 
-  cardName: "\uC2A4\uCF08\uB808\uD1A4 \uBCF4\uBCD1"
+  cardName: Skeleton Infantry
   cardType: 0
   maxHp: 12
   atk: 3
   skillCooldown: 3
   illustration: {fileID: 21300000, guid: f4cda12acee3a284f862b79a92f6a0c7, type: 3}
+  skillDescription: Forces all enemies to target this unit for 2 turns

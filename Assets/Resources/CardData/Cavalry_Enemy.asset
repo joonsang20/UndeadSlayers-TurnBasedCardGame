@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0f09ad5d23c0142b17a9636809e729, type: 3}
   m_Name: Cavalry_Enemy
   m_EditorClassIdentifier: 
-  cardName: "\uC2A4\uCF08\uB808\uD1A4 \uAE30\uB9C8\uBCD1"
+  cardName: Skeleton Cavalry
   cardType: 2
   maxHp: 9
   atk: 4
   skillCooldown: 4
   illustration: {fileID: 21300000, guid: 33bad8a134219f34399955b2ea468678, type: 3}
+  skillDescription: Stuns the target for 1 turn, preventing action

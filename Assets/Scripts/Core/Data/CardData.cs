@@ -11,4 +11,6 @@ public class CardData : ScriptableObject
     public int atk;
     public int skillCooldown;
     public Sprite illustration;
+    [TextArea(2, 4)]
+    public string skillDescription;
 }

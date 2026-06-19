@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +27,8 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private Button btnAttack;
     [SerializeField] private Button btnSkill;
     [SerializeField] private Button btnCancel;
+    [SerializeField] private TextMeshProUGUI topExplainText;
+    [SerializeField] private TextMeshProUGUI bottomExplainText;
 
     private readonly CardView[] playerCardViews = new CardView[3];
     private readonly CardView[] enemyCardViews  = new CardView[3];
@@ -48,12 +51,15 @@ public class BattleUI : MonoBehaviour
         gameManager.OnTurnStarted        += HandleTurnStarted;
         gameManager.OnActionPhaseBegin   += HandleActionPhaseBegin;
         gameManager.OnGameOver           += HandleGameOver;
+        gameManager.OnActionPerformed    += HandleActionPerformed;
         gameManager.Board.OnCardRefilled += HandleCardRefilled;
         gameManager.BattleResolver.OnCardRemoved += HandleCardRemoved;
 
         actionPanel.SetActive(false);
         playerTurnImage.gameObject.SetActive(false);
         enemyTurnImage.gameObject.SetActive(false);
+        topExplainText.text = "";
+        bottomExplainText.text = "";
 
         gameManager.StartGame();
         SpawnAllCards();
@@ -93,6 +99,7 @@ public class BattleUI : MonoBehaviour
     {
         ShowTurnIndicator(team == Team.Player ? playerTurnImage : enemyTurnImage,
                           team == Team.Player ? enemyTurnImage   : playerTurnImage);
+        bottomExplainText.text = "";
     }
 
     private void ShowTurnIndicator(Image show, Image hide)
@@ -135,11 +142,13 @@ public class BattleUI : MonoBehaviour
         if (team == Team.Player)
         {
             isActionPhaseActive = true;
+            bottomExplainText.text = "Choose a card to use";
             ShowSelectableCards();
         }
         else
         {
             isActionPhaseActive = false;
+            bottomExplainText.text = "";
             ClearAllHighlights();
         }
     }
@@ -182,6 +191,7 @@ public class BattleUI : MonoBehaviour
         ClearAllHighlights();
         selectedActor = view;
         view.SetSelected();
+        bottomExplainText.text = "";
 
         bool skillAvailable = view.Card.IsSkillReady
                               && view.Card.SkillStrategy.CanUse(view.Card, gameManager.Board);
@@ -204,6 +214,7 @@ public class BattleUI : MonoBehaviour
 
         actionPanel.SetActive(false);
         inputState = InputState.SelectingTarget;
+        bottomExplainText.text = "Select a target";
         ShowTargetHighlights();
     }
 
@@ -260,6 +271,7 @@ public class BattleUI : MonoBehaviour
         selectedActor = null;
         actionPanel.SetActive(false);
         inputState = InputState.Idle;
+        bottomExplainText.text = "Choose a card to use";
         ShowSelectableCards();
     }
 
@@ -294,11 +306,36 @@ public class BattleUI : MonoBehaviour
         }
     }
 
+    private void HandleActionPerformed(CardInstance actor, ActionType actionType, CardInstance target)
+    {
+        topExplainText.text = BuildActionMessage(actor, actionType, target);
+    }
+
+    private string BuildActionMessage(CardInstance actor, ActionType actionType, CardInstance target)
+    {
+        string actorName  = actor.Data.cardName;
+        string targetName = target?.Data.cardName;
+
+        if (actionType == ActionType.BasicAttack)
+            return $"{actorName} attacked {targetName} for {actor.Atk} damage";
+
+        return actor.Data.cardType switch
+        {
+            CardType.Cleric   => $"{actorName} healed {targetName ?? "allies"}",
+            CardType.Infantry => $"{actorName} used Taunt",
+            CardType.Archer   => $"{actorName} used Aim Shot on {targetName}",
+            CardType.Cavalry  => $"{actorName} used Stun on {targetName}",
+            _                 => $"{actorName} used a skill"
+        };
+    }
+
     private void HandleGameOver(GameResult result)
     {
         ClearAllHighlights();
         actionPanel.SetActive(false);
         isActionPhaseActive = false;
+        topExplainText.text = "";
+        bottomExplainText.text = "";
         playerTurnImage.gameObject.SetActive(false);
         enemyTurnImage.gameObject.SetActive(false);
     }

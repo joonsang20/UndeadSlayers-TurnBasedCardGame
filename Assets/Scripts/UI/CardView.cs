@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CardView : MonoBehaviour, IPointerClickHandler
+public class CardView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Image cardImage;
     [SerializeField] private Image border;
@@ -17,7 +17,7 @@ public class CardView : MonoBehaviour, IPointerClickHandler
     private bool isProvokingActive;
 
     private static readonly Color ColorSelectable  = new Color(0f, 1f, 0f, 1f);
-    private static readonly Color ColorSelected    = new Color(1f, 0.9f, 0f, 1f);
+    private static readonly Color ColorSelected    = new Color(0f, 1f, 0f, 1f);
     private static readonly Color ColorTarget      = new Color(1f, 0.3f, 0.3f, 1f);
     private static readonly Color ColorProvoke     = new Color(1f, 0.85f, 0.1f, 1f);
     private static readonly Color ColorStun        = new Color(0.65f, 0.2f, 1f, 1f);
@@ -199,6 +199,17 @@ public class CardView : MonoBehaviour, IPointerClickHandler
     {
         if (border != null)
             border.gameObject.SetActive(active);
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (Card != null && Card.Team == Team.Player)
+            TooltipUI.Instance?.Show(Card);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        TooltipUI.Instance?.Hide();
     }
 
     public void OnPointerClick(PointerEventData eventData)

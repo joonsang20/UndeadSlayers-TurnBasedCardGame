@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0f09ad5d23c0142b17a9636809e729, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: 
-  cardName: "\uC5D8\uD504 \uAD81\uC218"
+  cardName: Elf Archer
   cardType: 1
   maxHp: 7
   atk: 4
   skillCooldown: 3
   illustration: {fileID: 21300000, guid: 25c19e9988f1d304b8ece115ea3a700d, type: 3}
+  skillDescription: Deals 1.5x damage to a single target

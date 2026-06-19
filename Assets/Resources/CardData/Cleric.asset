@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0f09ad5d23c0142b17a9636809e729, type: 3}
   m_Name: Cleric
   m_EditorClassIdentifier: 
-  cardName: "\uC131\uC9C1\uC790"
+  cardName: Cleric
   cardType: 3
   maxHp: 8
   atk: 2
   skillCooldown: 3
   illustration: {fileID: 21300000, guid: b1d78a3cf21b3154a8c0dfbd4eeee431, type: 3}
+  skillDescription: Restores 5 HP to a target ally
